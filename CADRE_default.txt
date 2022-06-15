@@ -1,0 +1,8 @@
+[Global_Params]
+train_set = 'data/input/train.pkl'
+test_set = 'data/input/test.pkl'
+max_iter = 384000
+dropout_rate = 0.6
+learning_rate = 0.3
+batch_size = 8
+
