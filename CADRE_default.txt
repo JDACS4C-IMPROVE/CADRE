@@ -1,8 +1,26 @@
 [Global_Params]
 train_set = 'data/input/train.pkl'
 test_set = 'data/input/test.pkl'
-max_iter = 384000
+ptw_ids = 'data/input/ptw_ids.pkl'
 dropout_rate = 0.6
 learning_rate = 0.3
 batch_size = 8
-
+test_batch_size = 8
+test_inc_size = 1024
+model_label = 'cntx-attn-gdsc'
+is_train = True
+repository = 'gdsc'
+drug_id = -1
+use_cuda = True
+use_relu = False
+init_gene_emb = True
+omic = 'exp'
+use_attention = True
+use_cntx_attn = True
+embedding_dim = 200
+attention_size = 128
+attention_head = 8
+hidden_dim_enc = 200
+use_hid_lyr = False
+max_iter = 384000
+weight_decay = 3e-4
