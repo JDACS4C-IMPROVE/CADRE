@@ -17,11 +17,6 @@ additional_definitions = [
         "help": "size of attention parameter beta_j",
     },
     {
-        "name": "dropout_rate",
-        "type": float,
-        "help": "probability of an element to be zero-ed",
-    },
-    {
         "name": "drug_id",
         "type": int,
         "help": "the index of drug to be predicted in STL, -1 if MTL",
@@ -42,19 +37,9 @@ additional_definitions = [
         "help": "whether to use pretrained gene embedding or not",
     },
     {
-        "name": "is_train",
-        "type": bool,
-        "help": "whether to train or not (tune)",
-    },
-    {
         "name": "max_iter",
         "type": int,
         "help": "maximum number of training iterations",
-    },
-    {
-        "name": "model_label",
-        "type": str,
-        "help": "model name",
     },
     {
         "name": "omic",
@@ -80,16 +65,6 @@ additional_definitions = [
         "name": "test_inc_size",
         "type": int,
         "help": "increment interval size between log outputs",
-    },
-    {
-        "name": "test_set",
-        "type": str,
-        "help": "path to test set",
-    },
-    {
-        "name": "train_set",
-        "type": str,
-        "help": "path to train set",
     },
     {
         "name": "use_attention",

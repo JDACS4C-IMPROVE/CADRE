@@ -27,43 +27,44 @@ def initialize_parameters(default_model='CADRE_default.txt'):
 
 def load_data(args):
     print("Loading drug dataset...")
-    train_set = pickle.load(open(args['train_set'], 'rb'))
-    test_set = pickle.load(open(args['test_set'], 'rb'))
-    ptw_ids = pickle.load(open(args['ptw_ids'], 'rb'))
+    train_set = pickle.load(open(args.train_data, 'rb'))
+    test_set = pickle.load(open(args.test_data, 'rb'))
+    ptw_ids = pickle.load(open(args.ptw_ids, 'rb'))
     return train_set, test_set, ptw_ids
 
 
-def run(args):
+def run(gParameters):
+    args = candle.ArgumentStruct(**gParameters)
     print(args)
 
-    args['use_cuda'] = args['use_cuda'] and torch.cuda.is_available()
+    args.use_cuda = args.use_cuda and torch.cuda.is_available()
     train_set, test_set, ptw_ids = load_data(args)
 
     # replace tgt in train_set
     train_set['tgt'], train_set['msk'] = fill_mask(
         train_set['tgt'], train_set['msk'])
 
-    args['exp_size'] = train_set['exp_bin'].shape[1]
-    args['mut_size'] = train_set['mut_bin'].shape[1]
-    args['cnv_size'] = train_set['cnv_bin'].shape[1]
-    args['drg_size'] = train_set['tgt'].shape[1]
+    args.exp_size = train_set['exp_bin'].shape[1]
+    args.mut_size = train_set['mut_bin'].shape[1]
+    args.cnv_size = train_set['cnv_bin'].shape[1]
+    args.drg_size = train_set['tgt'].shape[1]
 
-    if args['omic'] == 'exp':
-        args['omc_size'] = args['exp_size']
-    elif args['omic'] == 'mut':
-        args['omc_size'] = args['mut_size']
-    elif args['omic'] == 'cnv':
-        args['omc_size'] = args['cnv_size']
+    if args.omic == 'exp':
+        args.omc_size = args.exp_size
+    elif args.omic == 'mut':
+        args.omc_size = args.mut_size
+    elif args.omic == 'cnv':
+        args.omc_size = args.cnv_size
 
-    args['train_size'] = len(train_set['tmr'])
-    args['test_size'] = len(test_set['tmr'])
+    args.train_size = len(train_set['tmr'])
+    args.test_size = len(test_set['tmr'])
 
     print(args)
 
     model = CF(args)
     model.build(ptw_ids)
 
-    if args['use_cuda']:
+    if args.use_cuda:
         model = model.cuda()
 
     logs = {'args': args, 'iter': [],
@@ -73,19 +74,19 @@ def run(args):
             'f1score_train': [], 'accuracy_train': [], 'auc_train': [],
             'loss': [], 'ptw_ids': ptw_ids}
 
-    if args['is_train']:
+    if args.train_bool:
         print("Training...")
         logs = model.train(train_set, test_set,
-                           batch_size=args['batch_size'],
-                           test_batch_size=args['test_batch_size'],
-                           max_iter=args['max_iter'],
-                           test_inc_size=args['test_inc_size'],
+                           batch_size=args.batch_size,
+                           test_batch_size=args.test_batch_size,
+                           max_iter=args.max_iter,
+                           test_inc_size=args.test_inc_size,
                            logs=logs)
 
         labels, msks, preds, tmr, amtr = model.test(
-            test_set, test_batch_size=args['test_batch_size'])
+            test_set, test_batch_size=args.test_batch_size)
         labels_train, msks_train, preds_train, tmr_train, amtr_train = model.test_train(
-            train_set, test_batch_size=args['test_batch_size'])
+            train_set, test_batch_size=args.test_batch_size)
 
         logs["preds"] = preds
         logs["msks"] = msks
@@ -102,17 +103,17 @@ def run(args):
     else:
         print("LR finding...")
         logs = model.find_lr(train_set, test_set,
-                             batch_size=args['batch_size'],
-                             test_batch_size=args['test_batch_size'],
-                             max_iter=args['max_iter'],
-                             test_inc_size=args['test_inc_size'],
+                             batch_size=args.batch_size,
+                             test_batch_size=args.test_batch_size,
+                             max_iter=args.max_iter,
+                             test_inc_size=args.test_inc_size,
                              logs=logs)
 
     for trial in range(0, 100):
-        if os.path.exists("data/output/cf-rep/logs"+str(trial)+".pkl"):
+        if os.path.exists(f"{args.save_path}/logs"+str(trial)+".pkl"):
             continue
     print(trial)
-    with open("data/output/cf/logs"+str(trial)+".pkl", "wb") as f:
+    with open(f"{args.save_path}/logs/{str(trial)}.pkl", "wb") as f:
         pickle.dump(logs, f, protocol=2)
 
     return None

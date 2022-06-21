@@ -28,21 +28,16 @@ class CF(Base):
 
         super(Base, self).__init__()
 
-        self.use_attention = args['use_attention']
-
-        self.embedding_dim = args['embedding_dim']
-        self.hidden_dim_enc = args['hidden_dim_enc']
-
-        self.omc_size = args['omc_size']
-        self.drg_size = args['drg_size']
-
-        self.attention_size = args['attention_size']
-        self.attention_head = args['attention_head']
-
-        self.weight_decay = args['weight_decay']
-
-        self.train_size = args['train_size']
-        self.test_size = args['test_size']
+        self.use_attention = args.use_attention
+        self.embedding_dim = args.embedding_dim
+        self.hidden_dim_enc = args.hidden_dim_enc
+        self.omc_size = args.omc_size
+        self.drg_size = args.drg_size
+        self.attention_size = args.attention_size
+        self.attention_head = args.attention_head
+        self.weight_decay = args.weight_decay
+        self.train_size = args.train_size
+        self.test_size = args.test_size
 
         self.rng_train = [idx for idx in range(self.train_size)]
         random.shuffle(self.rng_train)
@@ -50,25 +45,16 @@ class CF(Base):
         self.rng_test = [idx for idx in range(self.test_size)]
         random.shuffle(self.rng_test)
 
-        self.omic = args['omic']
-
-        self.dropout_rate = args['dropout_rate']
-
-        self.learning_rate = args['learning_rate']
-
-        self.use_cuda = args['use_cuda']
-
+        self.omic = args.omic
+        self.dropout_rate = args.dropout
+        self.learning_rate = args.learning_rate
+        self.use_cuda = args.use_cuda
         self.epsilon = 1e-5
-
-        self.init_gene_emb = args['init_gene_emb']
-
-        self.use_cntx_attn = args['use_cntx_attn']
-
-        self.use_hid_lyr = args['use_hid_lyr']
-
-        self.use_relu = args['use_relu']
-
-        self.repository = args['repository']
+        self.init_gene_emb = args.init_gene_emb
+        self.use_cntx_attn = args.use_cntx_attn
+        self.use_hid_lyr = args.use_hid_lyr
+        self.use_relu = args.use_relu
+        self.repository = args.repository
 
     def build(self, ptw_ids):
         """ Define modules of the model.
@@ -97,14 +83,10 @@ class CF(Base):
         self.sigmoid_entropy_loss = nn.BCEWithLogitsLoss(reduction="none")
 
     def forward(self, batch_set):
-        """ Forward process.
-
-        """
+        """ Forward process. """
 
         drg_ids = np.array([list(range(self.drg_size))])
-
         drg_ids = Variable(torch.LongTensor(drg_ids))
-
         ptw_ids = Variable(torch.LongTensor([self.ptw_ids]))
 
         if self.use_cuda:
@@ -112,15 +94,12 @@ class CF(Base):
             ptw_ids = ptw_ids.cuda()
 
         omc_idx = batch_set[self.omic+"_idx"]
-
         hid_omc = self.encoder(omc_idx, ptw_ids)
-
         logit_drg = self.decoder(hid_omc, drg_ids)
 
         return logit_drg
 
     def loss_cross_entropy(self, lgt_drg, tgts, msks):
-
         loss = torch.sum(
             torch.mul(self.sigmoid_entropy_loss(lgt_drg, tgts), msks)
         )/(torch.sum(msks)+self.epsilon)

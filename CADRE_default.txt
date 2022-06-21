@@ -1,8 +1,8 @@
 [Global_Params]
-train_set = 'data/input/train.pkl'
-test_set = 'data/input/test.pkl'
+train_data = 'data/input/train.pkl'
+test_data = 'data/input/test.pkl'
 ptw_ids = 'data/input/ptw_ids.pkl'
-dropout_rate = 0.6
+dropout = 0.6
 learning_rate = 0.3
 batch_size = 8
 test_batch_size = 8
