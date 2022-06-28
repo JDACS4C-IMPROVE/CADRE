@@ -1,0 +1,19 @@
+Bootstrap: docker
+From: pytorch/pytorch
+
+%labels
+	MANTAINER Oleksandr Narykov
+%setup
+	cp Singularity3.5.sh $SINGULARITY_ROOTFS
+%post
+	apt-get update
+	apt-get install -y git vim
+	chmod +x Singularity3.5.sh
+	./Singularity3.5.sh
+	cd /root
+	git clone https://github.com/yifengtao/CADRE
+	git clone https://github.com/jingcheng-du/Gene2vec.git
+	cp Gene2vec/pre_trained_emb/gene2vec_dim_200_iter_9.txt CADRE/data/input
+#	conda create --name CADRE pandas ipython scikit-learn pytorch matplotlib -y
+#	. /opt/conda/etc/profile.d/conda.sh
+#	conda activate CADRE
