@@ -14,6 +14,4 @@ From: pytorch/pytorch
 	git clone https://github.com/JDACS4C-IMPROVE/CADRE.git
 	git clone https://github.com/jingcheng-du/Gene2vec.git
 	cp Gene2vec/pre_trained_emb/gene2vec_dim_200_iter_9.txt CADRE/data/input
-#	conda create --name CADRE pandas ipython scikit-learn pytorch matplotlib -y
-#	. /opt/conda/etc/profile.d/conda.sh
-#	conda activate CADRE
+	python3 -m pip install git+https://github.com/ECP-CANDLE/candle_lib@develop
