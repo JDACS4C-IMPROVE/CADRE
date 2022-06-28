@@ -114,7 +114,7 @@ def run(gParameters):
         if os.path.exists(f"{args.output_dir}/logs"+str(trial)+".pkl"):
             continue
     print(trial)
-    with open(f"{args.output_dir}/logs/{str(trial)}.pkl", "wb") as f:
+    with open(f"{args.output_dir}/logs{str(trial)}.pkl", "wb") as f:
         pickle.dump(logs, f, protocol=2)
 
     return None
