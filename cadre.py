@@ -4,7 +4,7 @@ import os
 
 
 file_path = os.path.dirname(os.path.realpath(__file__))
-required = None
+
 additional_definitions = [
     {
         "name": "attention_head",
@@ -98,9 +98,15 @@ additional_definitions = [
     }
 ]
 
+required = [
+    'train_data',
+    'test_data',
+    'ptw_ids',
+    'output_dir'
+]
+
 
 class CADRE(candle.Benchmark):
-    required = None
 
     def set_locals(self):
         if required is not None:

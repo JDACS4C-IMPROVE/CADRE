@@ -30,6 +30,7 @@ def load_data(args):
     train_set = pickle.load(open(args.train_data, 'rb'))
     test_set = pickle.load(open(args.test_data, 'rb'))
     ptw_ids = pickle.load(open(args.ptw_ids, 'rb'))
+
     return train_set, test_set, ptw_ids
 
 
@@ -110,10 +111,10 @@ def run(gParameters):
                              logs=logs)
 
     for trial in range(0, 100):
-        if os.path.exists(f"{args.save_path}/logs"+str(trial)+".pkl"):
+        if os.path.exists(f"{args.output_dir}/logs"+str(trial)+".pkl"):
             continue
     print(trial)
-    with open(f"{args.save_path}/logs/{str(trial)}.pkl", "wb") as f:
+    with open(f"{args.output_dir}/logs/{str(trial)}.pkl", "wb") as f:
         pickle.dump(logs, f, protocol=2)
 
     return None

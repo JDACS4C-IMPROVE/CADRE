@@ -2,6 +2,7 @@
 train_data = 'data/input/train.pkl'
 test_data = 'data/input/test.pkl'
 ptw_ids = 'data/input/ptw_ids.pkl'
+output_dir = 'data/output/cf'
 dropout = 0.6
 learning_rate = 0.3
 batch_size = 8
@@ -22,5 +23,5 @@ attention_size = 128
 attention_head = 8
 hidden_dim_enc = 200
 use_hid_lyr = False
-max_iter = 384000
+max_iter = 1
 weight_decay = 3e-4
