@@ -82,7 +82,10 @@ class CF(Base):
         # multi-label loss with mask
         # https://pytorch.org/docs/master/nn.html#bcewithlogitsloss
         # nn.BCEWithLogitsLoss(reduction="none")
-        self.sigmoid_entropy_loss = nn.MSELoss(reduction="none")
+        if self.mode == 'regression':
+            self.sigmoid_entropy_loss = nn.MSELoss(reduction="none")
+        if self.mode == 'classification':
+            self.sigmoid_entropy_loss = nn.BCEWithLogitsLoss(reduction="none")
 
     def forward(self, batch_set):
         """ Forward process. """
@@ -220,6 +223,9 @@ class CF(Base):
 
                     mse, r2, explained_var = evaluate(
                         tgts, msks, prds, epsilon=self.epsilon, mode=self.mode)
+                    print(f'[{iter_train//len(self.rng_train)}, {iter_train % len(self.rng_train)}] | \
+                          tst MSE: {mse}, R ^2: {r2}, Explained Variance: {explained_var} | \
+                          trn MSE: {mse_train}, R ^ 2: {r2_train}, Explained Variance: {explained_var_train}')
 
                     logs["mse"].append(mse)
                     logs["r2"].append(r2)

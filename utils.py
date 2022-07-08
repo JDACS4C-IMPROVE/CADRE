@@ -252,6 +252,7 @@ def wrap_dataset_cuda(dataset, use_cuda):
     batch_dataset = {'tmr': dataset['tmr']}
     for k in ['tgt', 'msk']:
         if k in dataset.keys():
+            print(dataset[k])
             batch_dataset[k] = Variable(torch.FloatTensor(dataset[k]))
 
     for k in dataset.keys():
