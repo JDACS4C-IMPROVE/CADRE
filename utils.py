@@ -5,7 +5,7 @@ import random
 import numpy as np
 import pandas as pd
 
-from sklearn.metrics import auc, roc_curve, precision_recall_curve
+from sklearn.metrics import auc, explained_variance_score, roc_curve, precision_recall_curve, r2_score
 
 import torch
 from torch.autograd import Variable
@@ -312,7 +312,7 @@ def get_minibatch(dataset, rng, index, batch_size, batch_type="train", use_cuda=
     return batch_dataset
 
 
-def evaluate(labels, msks, preds, epsilon=1e-5):
+def evaluate(labels, msks, preds, epsilon=1e-5, mode='classification'):
     """ Calculate performance metrics given ground truths and prediction results.
 
     Parameters
@@ -348,21 +348,30 @@ def evaluate(labels, msks, preds, epsilon=1e-5):
     flat_preds_nr_msk = np.array([flat_preds_nr[idx]
                                  for idx, val in enumerate(flat_msks) if val == 1])
 
-    accuracy = np.mean(flat_labels_msk == flat_preds_msk)
-    true_pos = np.dot(flat_labels_msk, flat_preds_msk)
-    precision = 1.0*true_pos/(flat_preds_msk.sum()+epsilon)
-    recall = 1.0*true_pos/(flat_labels_msk.sum()+epsilon)
+    if mode == 'classification':
+        accuracy = np.mean(flat_labels_msk == flat_preds_msk)
+        true_pos = np.dot(flat_labels_msk, flat_preds_msk)
+        precision = 1.0*true_pos/(flat_preds_msk.sum()+epsilon)
+        recall = 1.0*true_pos/(flat_labels_msk.sum()+epsilon)
 
-    f1score = 2*precision*recall/(precision+recall+epsilon)
+        f1score = 2*precision*recall/(precision+recall+epsilon)
 
-    # a bug fixed
-    fpr, tpr, _ = roc_curve(flat_labels_msk, flat_preds_nr_msk)
-    auc_val = auc(fpr, tpr)
+        # a bug fixed
+        fpr, tpr, _ = roc_curve(flat_labels_msk, flat_preds_nr_msk)
+        auc_val = auc(fpr, tpr)
 
-    return precision, recall, f1score, accuracy, auc_val
+        return precision, recall, f1score, accuracy, auc_val
+
+    if mode == 'regression':
+        mse = (np.square(flat_labels_msk - flat_preds_msk)).mean()
+        r2 = r2_score(flat_labels_msk, flat_preds_msk)
+        explained_var = explained_variance_score(
+            flat_labels_msk, flat_preds_msk)
+
+        return mse, r2, explained_var
 
 
-def evaluate_all(labels, msks, preds, epsilon=1e-5):
+def evaluate_all(labels, msks, preds, epsilon=1e-5, mode='classification'):
     """ Calculate performance metrics given ground truths and prediction results.
 
     Parameters
@@ -398,19 +407,28 @@ def evaluate_all(labels, msks, preds, epsilon=1e-5):
     flat_preds_nr_msk = np.array([flat_preds_nr[idx]
                                  for idx, val in enumerate(flat_msks) if val == 1])
 
-    accuracy = np.mean(flat_labels_msk == flat_preds_msk)
-    true_pos = np.dot(flat_labels_msk, flat_preds_msk)
-    precision = 1.0*true_pos/(flat_preds_msk.sum()+epsilon)
-    recall = 1.0*true_pos/(flat_labels_msk.sum()+epsilon)
+    if mode == 'classification':
+        accuracy = np.mean(flat_labels_msk == flat_preds_msk)
+        true_pos = np.dot(flat_labels_msk, flat_preds_msk)
+        precision = 1.0*true_pos/(flat_preds_msk.sum()+epsilon)
+        recall = 1.0*true_pos/(flat_labels_msk.sum()+epsilon)
 
-    f1score = 2*precision*recall/(precision+recall+epsilon)
+        f1score = 2*precision*recall/(precision+recall+epsilon)
 
-    # a bug fixed
-    fpr, tpr, _ = roc_curve(flat_labels_msk, flat_preds_nr_msk)
-    auc_roc_val = auc(fpr, tpr)
+        # a bug fixed
+        fpr, tpr, _ = roc_curve(flat_labels_msk, flat_preds_nr_msk)
+        auc_roc_val = auc(fpr, tpr)
 
-    precision_list, recall_list, _ = precision_recall_curve(
-        flat_labels_msk, flat_preds_nr_msk)
-    auc_pr_val = auc(recall_list, precision_list)
+        precision_list, recall_list, _ = precision_recall_curve(
+            flat_labels_msk, flat_preds_nr_msk)
+        auc_pr_val = auc(recall_list, precision_list)
 
-    return precision, recall, f1score, accuracy, auc_roc_val, auc_pr_val
+        return precision, recall, f1score, accuracy, auc_roc_val, auc_pr_val
+
+    if mode == 'regression':
+        mse = (np.square(flat_labels_msk - flat_preds_msk)).mean()
+        r2 = r2_score(flat_labels_msk, flat_preds_msk)
+        explained_var = explained_variance_score(
+            flat_labels_msk, flat_preds_msk)
+
+        return mse, r2, explained_var

@@ -95,6 +95,21 @@ additional_definitions = [
         "name": "weight_decay",
         "type": float,
         "help": "coefficient of l2 regularizer",
+    },
+    {
+        "name": "mode",
+        "type": str,
+        "help": "Classification or regression problem selection",
+    },
+    {
+        "name": "is_train",
+        "type": bool,
+        "help": "Whether to train a model",
+    },
+    {
+        "name": "model_label",
+        "type": str,
+        "help": "Label of the model",
     }
 ]
 

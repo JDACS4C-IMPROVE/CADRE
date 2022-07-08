@@ -68,12 +68,21 @@ def run(gParameters):
     if args.use_cuda:
         model = model.cuda()
 
-    logs = {'args': args, 'iter': [],
-            'precision': [], 'recall': [],
-            'f1score': [], 'accuracy': [], 'auc': [],
-            'precision_train': [], 'recall_train': [],
-            'f1score_train': [], 'accuracy_train': [], 'auc_train': [],
-            'loss': [], 'ptw_ids': ptw_ids}
+    logs = None
+    if args.mode == 'classification':
+        logs = {'args': args, 'iter': [],
+                'precision': [], 'recall': [],
+                'f1score': [], 'accuracy': [], 'auc': [],
+                'precision_train': [], 'recall_train': [],
+                'f1score_train': [], 'accuracy_train': [], 'auc_train': [],
+                'loss': [], 'ptw_ids': ptw_ids}
+    elif args.mode == 'regression':
+        logs = {'args': args, 'iter': [],
+                'mse': [], 'r2': [],
+                'explained_var': [],
+                'mse_train': [], 'r2_train': [],
+                'explained_var_train': [],
+                'loss': [], 'ptw_ids': ptw_ids}
 
     if args.train_bool:
         print("Training...")

@@ -55,6 +55,7 @@ class CF(Base):
         self.use_hid_lyr = args.use_hid_lyr
         self.use_relu = args.use_relu
         self.repository = args.repository
+        self.mode = args.mode
 
     def build(self, ptw_ids):
         """ Define modules of the model.
@@ -80,7 +81,8 @@ class CF(Base):
 
         # multi-label loss with mask
         # https://pytorch.org/docs/master/nn.html#bcewithlogitsloss
-        self.sigmoid_entropy_loss = nn.BCEWithLogitsLoss(reduction="none")
+        # nn.BCEWithLogitsLoss(reduction="none")
+        self.sigmoid_entropy_loss = nn.MSELoss(reduction="none")
 
     def forward(self, batch_set):
         """ Forward process. """
@@ -183,33 +185,51 @@ class CF(Base):
                 msks_train = np.concatenate(msks_train, axis=0)
                 prds_train = np.concatenate(prds_train, axis=0)
 
-                precision_train, recall_train, f1score_train, accuracy_train, auc_train = evaluate(
-                    tgts_train, msks_train, prds_train, epsilon=self.epsilon)
+                tgts, msks, prds, _, _ = self.test(
+                    test_set, test_batch_size)
 
-                tgts, msks, prds, _, _ = self.test(test_set, test_batch_size)
+                if self.mode == 'classification':
+                    precision_train, recall_train, f1score_train, accuracy_train, auc_train = evaluate(
+                        tgts_train, msks_train, prds_train, epsilon=self.epsilon, mode=self.mode)
 
-                precision, recall, f1score, accuracy, auc = evaluate(
-                    tgts, msks, prds, epsilon=self.epsilon)
+                    precision, recall, f1score, accuracy, auc = evaluate(
+                        tgts, msks, prds, epsilon=self.epsilon, mode=self.mode)
 
-                print("[%d,%d] | tst f1:%.1f, auc:%.1f | trn f1:%.1f, auc:%.1f, loss:%.3f" % (iter_train//len(self.rng_train),
-                      iter_train % len(
-                          self.rng_train), 100.0*f1score, 100.0*auc, 100.0*f1score_train, 100.0*auc_train,
-                      np.mean(losses)))
+                    print("[%d,%d] | tst f1:%.1f, auc:%.1f | trn f1:%.1f, auc:%.1f, loss:%.3f" % (iter_train//len(self.rng_train),
+                          iter_train % len(
+                              self.rng_train), 100.0*f1score, 100.0*auc, 100.0*f1score_train, 100.0*auc_train,
+                          np.mean(losses)))
+
+                    logs["precision"].append(precision)
+                    logs["recall"].append(recall)
+                    logs["f1score"].append(f1score)
+                    logs["accuracy"].append(accuracy)
+                    logs["auc"].append(auc)
+
+                    logs["precision_train"].append(precision_train)
+                    logs["recall_train"].append(recall_train)
+                    logs["f1score_train"].append(f1score_train)
+                    logs["accuracy_train"].append(accuracy_train)
+                    logs["auc_train"].append(auc_train)
+
+                    logs['loss'].append(np.mean(losses))
+
+                if self.mode == 'regression':
+                    mse_train, r2_train, explained_var_train = evaluate(
+                        tgts_train, msks_train, prds_train, epsilon=self.epsilon, mode=self.mode)
+
+                    mse, r2, explained_var = evaluate(
+                        tgts, msks, prds, epsilon=self.epsilon, mode=self.mode)
+
+                    logs["mse"].append(mse)
+                    logs["r2"].append(r2)
+                    logs["explained_var"].append(explained_var)
+
+                    logs["mse_train"].append(mse_train)
+                    logs["r2_train"].append(r2_train)
+                    logs["explained_var_train"].append(explained_var_train)
 
                 logs["iter"].append(iter_train)
-                logs["precision"].append(precision)
-                logs["recall"].append(recall)
-                logs["f1score"].append(f1score)
-                logs["accuracy"].append(accuracy)
-                logs["auc"].append(auc)
-
-                logs["precision_train"].append(precision_train)
-                logs["recall_train"].append(recall_train)
-                logs["f1score_train"].append(f1score_train)
-                logs["accuracy_train"].append(accuracy_train)
-                logs["auc_train"].append(auc_train)
-
-                logs['loss'].append(np.mean(losses))
 
                 tgts_train, prds_train, msks_train = [], [], []
                 losses, losses_ent = [], []

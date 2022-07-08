@@ -25,3 +25,4 @@ hidden_dim_enc = 200
 use_hid_lyr = False
 max_iter = 384000
 weight_decay = 3e-4
+mode = 'regression'
