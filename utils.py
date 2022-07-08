@@ -349,6 +349,8 @@ def evaluate(labels, msks, preds, epsilon=1e-5, mode='classification'):
     flat_preds_nr_msk = np.array([flat_preds_nr[idx]
                                  for idx, val in enumerate(flat_msks) if val == 1])
 
+    # print(flat_preds[:2])
+
     if mode == 'classification':
         accuracy = np.mean(flat_labels_msk == flat_preds_msk)
         true_pos = np.dot(flat_labels_msk, flat_preds_msk)

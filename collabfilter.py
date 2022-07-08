@@ -172,13 +172,21 @@ class CF(Base):
             if self.use_cuda:
                 tgts_train.append(tgts.data.cpu().numpy())
                 msks_train.append(msks.data.cpu().numpy())
-                prds_train.append(torch.sigmoid(lgt_drg).data.cpu().numpy())
+                if self.mode == 'classification':
+                    prds_train.append(torch.sigmoid(
+                        lgt_drg).data.cpu().numpy())
+                elif self.mode == 'regression':
+                    prds_train.append(lgt_drg.data.cpu().numpy())
                 losses.append(loss.data.cpu().numpy().tolist())
                 losses_ent.append(loss_ent.data.cpu().numpy().tolist())
             else:
                 tgts_train.append(tgts.data.numpy())
                 msks_train.append(msks.data.numpy())
-                prds_train.append(torch.sigmoid(lgt_drg).data.numpy())
+                if self.mode == 'classification':
+                    prds_train.append(torch.sigmoid(
+                        lgt_drg).data.cpu().numpy())
+                elif self.mode == 'regression':
+                    prds_train.append(lgt_drg.data.cpu().numpy())
                 losses.append(loss.data.numpy().tolist())
                 losses_ent.append(loss_ent.data.numpy().tolist())
 
